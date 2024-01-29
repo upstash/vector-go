@@ -29,6 +29,7 @@ func NewClient(url string, token string) *Client {
 }
 
 func NewClientWith(options Options) *Client {
+	options.init()
 	return &Client{
 		url:    options.Url,
 		token:  options.Token,
