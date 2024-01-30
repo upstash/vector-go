@@ -48,6 +48,14 @@ type Deleted struct {
 	Deleted int `json:"deleted"`
 }
 
+type IndexInfo struct {
+	VectorCount        int    `json:"vectorCount"`
+	PendingVectorCount int    `json:"pendingVectorCount"`
+	IndexSize          int    `json:"indexSize"`
+	Dimension          int    `json:"dimension"`
+	SimilarityFunction string `json:"similarityFunction"`
+}
+
 type Response[T any] struct {
 	Result T      `json:"result,omitempty"`
 	Error  string `json:"error,omitempty"`
