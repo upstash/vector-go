@@ -6,8 +6,8 @@ const fetchPath = "/fetch"
 // When f.IncludeVectors is true, values of the vectors are also
 // returned. When f.IncludeMetadata is true, metadata of the vectors
 // are also returned, if any.
-func (c *Client) Fetch(f Fetch) (vectors []Vector, err error) {
-	data, err := c.sendJson(fetchPath, f)
+func (ix *Index) Fetch(f Fetch) (vectors []Vector, err error) {
+	data, err := ix.sendJson(fetchPath, f)
 	if err != nil {
 		return
 	}

@@ -9,8 +9,8 @@ const rangePath = "/range"
 // When r.IncludeVectors is true, values of the vectors are also returned.
 // When r.IncludeMetadata is true, metadata of the vectors are also returned,
 // if any.
-func (c *Client) Range(r Range) (vectors RangeVectors, err error) {
-	data, err := c.sendJson(rangePath, r)
+func (ix *Index) Range(r Range) (vectors RangeVectors, err error) {
+	data, err := ix.sendJson(rangePath, r)
 	if err != nil {
 		return
 	}

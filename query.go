@@ -9,8 +9,8 @@ const queryPath = "/query"
 // given query vector. When q.IncludeVectors is true, values of the vectors are
 // also returned. When q.IncludeMetadata is true, metadata of the vectors are
 // also returned, if any.
-func (c *Client) Query(q Query) (scores []VectorScore, err error) {
-	data, err := c.sendJson(queryPath, q)
+func (ix *Index) Query(q Query) (scores []VectorScore, err error) {
+	data, err := ix.sendJson(queryPath, q)
 	if err != nil {
 		return
 	}

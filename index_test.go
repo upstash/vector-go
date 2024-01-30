@@ -8,8 +8,8 @@ import (
 	"github.com/stretchr/testify/require"
 )
 
-func newTestClient() (*Client, error) {
-	client := NewClient(
+func newTestClient() (*Index, error) {
+	client := NewIndex(
 		os.Getenv(UrlEnvProperty),
 		os.Getenv(TokenEnvProperty),
 	)
@@ -22,14 +22,14 @@ func newTestClient() (*Client, error) {
 	return client, nil
 }
 
-func newTestClientWith(client *http.Client) (*Client, error) {
+func newTestClientWith(client *http.Client) (*Index, error) {
 	opts := Options{
 		Url:    os.Getenv(UrlEnvProperty),
 		Token:  os.Getenv(TokenEnvProperty),
 		Client: client,
 	}
 
-	c := NewClientWith(opts)
+	c := NewIndexWith(opts)
 
 	err := c.Reset()
 	if err != nil {

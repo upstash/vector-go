@@ -37,59 +37,60 @@ func (o *Options) init() {
 	}
 }
 
-// NewClient returns a client to be used with Upstash Vector
+// NewIndex returns an index client to be used with Upstash Vector
 // with the given url and token.
-func NewClient(url string, token string) *Client {
-	return NewClientWith(Options{
+func NewIndex(url string, token string) *Index {
+	return NewIndexWith(Options{
 		Url:   url,
 		Token: token,
 	})
 }
 
-// NewClientFromEnv returns a client to be used with Upstash Vector
+// NewIndexFromEnv returns an index client to be used with Upstash Vector
 // by reading URL and token from the environment variables.
-func NewClientFromEnv() *Client {
-	return NewClientWith(Options{
+func NewIndexFromEnv() *Index {
+	return NewIndexWith(Options{
 		Url:   os.Getenv(UrlEnvProperty),
 		Token: os.Getenv(TokenEnvProperty),
 	})
 }
 
-// NewClientWith returns a client to be used with Upstash Vector
+// NewIndexWith returns an index client to be used with Upstash Vector
 // with the given options.
-func NewClientWith(options Options) *Client {
+func NewIndexWith(options Options) *Index {
 	options.init()
-	return &Client{
+	return &Index{
 		url:    options.Url,
 		token:  options.Token,
 		client: options.Client,
 	}
 }
 
-type Client struct {
+// Index is a client for Upstash Vector index.
+type Index struct {
 	url    string
 	token  string
 	client *http.Client
 }
 
-func (c *Client) sendJson(path string, obj any) (data []byte, err error) {
+func (ix *Index) sendJson(path string, obj any) (data []byte, err error) {
 	if data, err = json.Marshal(obj); err != nil {
 		return
 	}
-	return c.sendBytes(path, data)
+	return ix.sendBytes(path, data)
 }
 
-func (c *Client) sendBytes(path string, obj []byte) (data []byte, err error) {
-	return c.send(path, bytes.NewReader(obj))
+func (ix *Index) sendBytes(path string, obj []byte) (data []byte, err error) {
+	return ix.send(path, bytes.NewReader(obj))
 }
 
-func (c *Client) send(path string, r io.Reader) (data []byte, err error) {
-	request, err := http.NewRequest("POST", c.url+path, r)
+func (ix *Index) send(path string, r io.Reader) (data []byte, err error) {
+	request, err := http.NewRequest("POST", ix.url+path, r)
 	if err != nil {
 		return
 	}
-	request.Header.Add("Authorization", "Bearer "+c.token)
-	response, err := c.client.Do(request)
+	request.Header.Add("Authorization", "Bearer "+ix.token)
+	response, err := ix.client.Do(request)
 	if err != nil {
 		return
 	}

@@ -16,7 +16,7 @@ go get github.com/upstash/vector-go
 
 ### Initializing the client
 
-There are two pieces of configuration required to use the Upstash vector client: an REST token and REST URL. 
+There are two pieces of configuration required to use the Upstash Vector index client: an REST token and REST URL. 
 Find your configuration values in the console dashboard at [https://console.upstash.com/](https://console.upstash.com/).
 
 ```go
@@ -25,7 +25,7 @@ import (
 )
 
 func main() {
-	client := vector.NewClient("<UPSTASH_VECTOR_REST_URL>", "<UPSTASH_VECTOR_REST_TOKEN>")
+	index := vector.NewIndex("<UPSTASH_VECTOR_REST_URL>", "<UPSTASH_VECTOR_REST_TOKEN>")
 }
 ```
 
@@ -36,7 +36,7 @@ UPSTASH_VECTOR_REST_URL="your_rest_url"
 UPSTASH_VECTOR_REST_TOKEN="your_rest_token"
 ```
 
-and then create client by using:
+and then create index client by using:
 
 ```go
 import (
@@ -44,7 +44,7 @@ import (
 )
 
 func main() {
-	client := vector.NewClientFromEnv()
+	index := vector.NewIndexFromEnv()
 }
 ```
 
@@ -67,7 +67,7 @@ func main() {
 		Token:  "<UPSTASH_VECTOR_REST_TOKEN>",
 		Client: &http.Client{},
 	}
-	client := vector.NewClientWith(opts)
+	index := vector.NewIndexWith(opts)
 }
 ```
 
@@ -97,13 +97,13 @@ upserts := []vector.Upsert{
     },
 }
 
-err := client.UpsertMany(upserts)
+err := index.UpsertMany(upserts)
 ```
 
 #### Upsert One
 
 ```go
-err := client.Upsert(vector.Upsert{
+err := index.Upsert(vector.Upsert{
     Id:     "2",
     Vector: []float32{1.0, 0.0},
 })
@@ -122,7 +122,7 @@ When `IncludeMetadata` is `true`, the response will contain the metadata of the
 vectors, if any.
 
 ```go
-scores, err := client.Query(vector.Query{
+scores, err := index.Query(vector.Query{
     Vector:          []float32{0.0, 1.0},
     TopK:            2,
     IncludeVectors:  false,
@@ -140,7 +140,7 @@ When `IncludeMetadata` is `true`, the response will contain the metadata of the
 vectors, if any.
 
 ```go
-vectors, err := client.Fetch(vector.Fetch{
+vectors, err := index.Fetch(vector.Fetch{
     Ids: []string{"0", "1"},
     IncludeVectors: false,
     IncludeMetadata: false,
@@ -154,13 +154,13 @@ Vectors can be deleted from the index.
 #### Delete many
 
 ```go
-count, err := client.DeleteMany([]string{"0", "999"})
+count, err := index.DeleteMany([]string{"0", "999"})
 ```
 
 #### Delete One
 
 ```go
-ok, err := client.Delete("2")
+ok, err := index.Delete("2")
 ```
 
 ### Scanning the Vectors
@@ -175,7 +175,7 @@ When `IncludeMetadata` is `true`, the response will contain the metadata of the
 vectors, if any.
 
 ```go
-vectors, err := client.Range(vector.Range{
+vectors, err := index.Range(vector.Range{
     Cursor:          "0",
     Limit:           10,
     IncludeVectors:  false,
@@ -188,7 +188,7 @@ for vectors.NextCursor != "" {
     }
 
     // Fetch the next range batch
-    vectors, err = client.Range(vector.Range{
+    vectors, err = index.Range(vector.Range{
         Cursor:          vectors.NextCursor,
         Limit:           10,
         IncludeVectors:  false,
@@ -202,11 +202,11 @@ for vectors.NextCursor != "" {
 Reset will delete all the vectors and reset the index to its initial state.
 
 ```go
-err := client.Reset()
+err := index.Reset()
 ```
 
 ### Getting Index Information
 
 ```go
-info, err := client.Info()
+info, err := index.Info()
 ```
