@@ -44,7 +44,7 @@ type RangeVectors struct {
 	Vectors    []Vector `json:"vectors,omitempty"`
 }
 
-type Deleted struct {
+type deleted struct {
 	Deleted int `json:"deleted"`
 }
 
