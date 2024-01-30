@@ -6,7 +6,6 @@ import (
 	"errors"
 	"io"
 	"net/http"
-	"strings"
 )
 
 type Options struct {
@@ -48,10 +47,6 @@ func (c *Client) sendJson(path string, obj any) (data []byte, err error) {
 		return
 	}
 	return c.sendBytes(path, data)
-}
-
-func (c *Client) sendString(path string, obj string) (data []byte, err error) {
-	return c.send(path, strings.NewReader(obj))
 }
 
 func (c *Client) sendBytes(path string, obj []byte) (data []byte, err error) {
