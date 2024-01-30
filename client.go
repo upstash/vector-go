@@ -6,6 +6,12 @@ import (
 	"errors"
 	"io"
 	"net/http"
+	"os"
+)
+
+const (
+	UrlEnvProperty   = "UPSTASH_VECTOR_REST_URL"
+	TokenEnvProperty = "UPSTASH_VECTOR_REST_TOKEN"
 )
 
 type Options struct {
@@ -23,6 +29,12 @@ func (o *Options) init() {
 	if o.Client == nil {
 		o.Client = http.DefaultClient
 	}
+	if o.Url == "" {
+		panic("Missing Upstash Vector URL")
+	}
+	if o.Token == "" {
+		panic("Missing Upstash Vector Token")
+	}
 }
 
 // NewClient returns a client to be used with Upstash Vector
@@ -34,7 +46,16 @@ func NewClient(url string, token string) *Client {
 	})
 }
 
-// NewClient returns a client to be used with Upstash Vector
+// NewClientFromEnv returns a client to be used with Upstash Vector
+// by reading URL and token from the environment variables.
+func NewClientFromEnv() *Client {
+	return NewClientWith(Options{
+		Url:   os.Getenv(UrlEnvProperty),
+		Token: os.Getenv(TokenEnvProperty),
+	})
+}
+
+// NewClientWith returns a client to be used with Upstash Vector
 // with the given options.
 func NewClientWith(options Options) *Client {
 	options.init()

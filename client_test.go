@@ -10,8 +10,8 @@ import (
 
 func newTestClient() (*Client, error) {
 	client := NewClient(
-		os.Getenv("UPSTASH_VECTOR_REST_URL"),
-		os.Getenv("UPSTASH_VECTOR_REST_TOKEN"),
+		os.Getenv(UrlEnvProperty),
+		os.Getenv(TokenEnvProperty),
 	)
 
 	err := client.Reset()
@@ -24,8 +24,8 @@ func newTestClient() (*Client, error) {
 
 func newTestClientWith(client *http.Client) (*Client, error) {
 	opts := Options{
-		Url:    os.Getenv("UPSTASH_VECTOR_REST_URL"),
-		Token:  os.Getenv("UPSTASH_VECTOR_REST_TOKEN"),
+		Url:    os.Getenv(UrlEnvProperty),
+		Token:  os.Getenv(TokenEnvProperty),
 		Client: client,
 	}
 

@@ -29,6 +29,25 @@ func main() {
 }
 ```
 
+Alternatively, you can set following environment variables:
+
+```shell
+UPSTASH_VECTOR_REST_URL="your_rest_url"
+UPSTASH_VECTOR_REST_TOKEN="your_rest_token"
+```
+
+and then create client by using:
+
+```go
+import (
+	"github.com/upstash/vector-go"
+)
+
+func main() {
+	client := vector.NewClientFromEnv()
+}
+```
+
 #### Using a custom HTTP client
 
 By default, `http.DefaultClient` will be used for doing requests. It is possible
