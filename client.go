@@ -10,8 +10,13 @@ import (
 )
 
 type Options struct {
-	Url    string
-	Token  string
+	// URL of the Upstash Vector index.
+	Url string
+
+	// Token of the Upstash Vector index.
+	Token string
+
+	// The HTTP client to use for requests.
 	Client *http.Client
 }
 
@@ -21,6 +26,8 @@ func (o *Options) init() {
 	}
 }
 
+// NewClient returns a client to be used with Upstash Vector
+// with the given url and token.
 func NewClient(url string, token string) *Client {
 	return NewClientWith(Options{
 		Url:   url,
@@ -28,6 +35,8 @@ func NewClient(url string, token string) *Client {
 	})
 }
 
+// NewClient returns a client to be used with Upstash Vector
+// with the given options.
 func NewClientWith(options Options) *Client {
 	options.init()
 	return &Client{
@@ -74,7 +83,7 @@ func (c *Client) send(path string, r io.Reader) (data []byte, err error) {
 }
 
 func parseResponse[T any](data []byte) (t T, err error) {
-	var result Response[T]
+	var result response[T]
 	if err = json.Unmarshal(data, &result); err != nil {
 		return
 	}
