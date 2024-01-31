@@ -1,12 +1,22 @@
 package vector
 
 import (
+	"errors"
+	"io/fs"
 	"net/http"
 	"os"
 	"testing"
 
+	"github.com/joho/godotenv"
 	"github.com/stretchr/testify/require"
 )
+
+func init() {
+	err := godotenv.Load()
+	if err != nil && !errors.Is(err, fs.ErrNotExist) {
+		panic(err)
+	}
+}
 
 func newTestClient() (*Index, error) {
 	client := NewIndex(

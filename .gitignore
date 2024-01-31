@@ -2,3 +2,4 @@
 .vscode
 tmp/
 go.work.sum
+.env
