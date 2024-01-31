@@ -6,8 +6,7 @@ const deletePath = "/delete"
 // whether the vector is deleted. If a vector with the given
 // id is not found, Delete returns false.
 func (ix *Index) Delete(id string) (ok bool, err error) {
-	// workaround for server that does not accept string bodies
-	data, err := ix.sendJson(deletePath, []string{id})
+	data, err := ix.sendBytes(deletePath, []byte(id))
 	if err != nil {
 		return
 	}
