@@ -1,5 +1,10 @@
 # Upstash Vector Go Client
 
+> [!NOTE]  
+> **This project is in GA Stage.**
+>
+> The Upstash Professional Support fully covers this project. It receives regular updates, and bug fixes. The Upstash team is committed to maintaining and improving its functionality.
+
 This is the Go client for [Upstash](https://upstash.com/) Vector.
 
 ## Documentation
