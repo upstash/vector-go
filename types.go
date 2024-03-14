@@ -24,6 +24,9 @@ type Query struct {
 
 	// Whether to include metadata in the query response, if any.
 	IncludeMetadata bool `json:"includeMetadata,omitempty"`
+
+	// Query filter
+	Filter any `json:"filter,omitempty"`
 }
 
 type Vector struct {

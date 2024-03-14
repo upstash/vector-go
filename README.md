@@ -116,7 +116,7 @@ err := index.Upsert(vector.Upsert{
 
 ### Querying Vectors
 
-The query vector must be present and it must have the same dimensions with the
+The query vector must be present, and it must have the same dimensions with the
 all the other vectors in the index.
 
 When `TopK` is specified, at most that many vectors will be returned.
@@ -132,6 +132,20 @@ scores, err := index.Query(vector.Query{
     TopK:            2,
     IncludeVectors:  false,
     IncludeMetadata: false,
+})
+```
+
+Additionally, a metadata filter can be specified in queries. When `Filter` is given, the response will contain 
+only the values whose metadata matches the given filter. See [Metadata Filtering](https://upstash.com/docs/vector/features/metadatafiltering) 
+docs for more information.
+
+```go
+scores, err := index.Query(vector.Query{
+    Vector:          []float32{0.0, 1.0},
+    TopK:            2,
+    IncludeVectors:  false,
+    IncludeMetadata: false,
+    Filter: `foo = 'bar'`
 })
 ```
 
