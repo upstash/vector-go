@@ -11,9 +11,40 @@ type Upsert struct {
 	Metadata map[string]any `json:"metadata,omitempty"`
 }
 
+type UpsertData struct {
+	// Unique id of the vector.
+	Id string `json:"id"`
+
+	// Raw data.
+	// Data will be converted to the vector embedding on the server.
+	Data string `json:"data"`
+
+	// Optional metadata of the vector.
+	Metadata map[string]any `json:"metadata,omitempty"`
+}
+
 type Query struct {
 	// The query vector.
 	Vector []float32 `json:"vector"`
+
+	// The maximum number of vectors that will
+	// be returned for the query response.
+	TopK int `json:"topK,omitempty"`
+
+	// Whether to include vector values in the query response.
+	IncludeVectors bool `json:"includeVectors,omitempty"`
+
+	// Whether to include metadata in the query response, if any.
+	IncludeMetadata bool `json:"includeMetadata,omitempty"`
+
+	// Query filter
+	Filter any `json:"filter,omitempty"`
+}
+
+type QueryData struct {
+	// Raw data.
+	// Data will be converted to the vector embedding on the server.
+	Data string `json:"data"`
 
 	// The maximum number of vectors that will
 	// be returned for the query response.

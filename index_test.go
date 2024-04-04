@@ -32,6 +32,20 @@ func newTestClient() (*Index, error) {
 	return client, nil
 }
 
+func newEmbeddingTestClient() (*Index, error) {
+	client := NewIndex(
+		os.Getenv("EMBEDDING_"+UrlEnvProperty),
+		os.Getenv("EMBEDDING_"+TokenEnvProperty),
+	)
+
+	err := client.Reset()
+	if err != nil {
+		return nil, err
+	}
+
+	return client, nil
+}
+
 func newTestClientWith(client *http.Client) (*Index, error) {
 	opts := Options{
 		Url:    os.Getenv(UrlEnvProperty),
