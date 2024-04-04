@@ -114,6 +114,42 @@ err := index.Upsert(vector.Upsert{
 })
 ```
 
+### Upserting with Raw Data
+
+If the vector index is created with a predefined embedding model, it can be populated using the raw data
+without explicitly converting it to an embedding. Upstash server will create the embedding 
+and index the generated vectors.
+
+Upsert can be used to insert new vectors into index or to update
+existing vectors.
+
+#### Upsert many
+
+```go
+upserts := []vector.UpsertData{
+    {
+        Id:     "0",
+        Data:   "Capital of Turkey is Ankara.",
+    },
+    {
+        Id:       "1",
+        Data:     "Capital of Japan is Tokyo.",
+        Metadata: map[string]any{"foo": "bar"}, // optional metadata
+    },
+}
+
+err := index.UpsertDataMany(upserts)
+```
+
+#### Upsert One
+
+```go
+err := index.UpsertData(vector.UpsertData{
+    Id:     "2",
+    Data:   "Capital of Turkey is Ankara.",
+})
+```
+
 ### Querying Vectors
 
 The query vector must be present, and it must have the same dimensions with the
@@ -142,6 +178,28 @@ docs for more information.
 ```go
 scores, err := index.Query(vector.Query{
     Vector:          []float32{0.0, 1.0},
+    TopK:            2,
+    IncludeVectors:  false,
+    IncludeMetadata: false,
+    Filter: `foo = 'bar'`
+})
+```
+
+### Querying with Raw Data
+
+If the vector index is created with a predefined embedding model, a query can be executed using the raw data
+without explicitly converting it to an embedding. Upstash server will create the embedding and run the query.
+
+When `TopK` is specified, at most that many vectors will be returned.
+
+When `IncludeVectors` is `true`, the response will contain the vector values.
+
+When `IncludeMetadata` is `true`, the response will contain the metadata of the
+vectors, if any.
+
+```go
+scores, err := index.QueryData(vector.QueryData{
+    Data:            "Where is the capital of Turkey?",
     TopK:            2,
     IncludeVectors:  false,
     IncludeMetadata: false,
