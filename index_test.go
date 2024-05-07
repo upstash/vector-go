@@ -2,13 +2,16 @@ package vector
 
 import (
 	"errors"
+	"github.com/joho/godotenv"
+	"github.com/stretchr/testify/require"
 	"io/fs"
 	"net/http"
 	"os"
 	"testing"
+)
 
-	"github.com/joho/godotenv"
-	"github.com/stretchr/testify/require"
+var (
+	namespaces = [...]string{"", "ns"}
 )
 
 func init() {
@@ -24,26 +27,46 @@ func newTestClient() (*Index, error) {
 		os.Getenv(TokenEnvProperty),
 	)
 
-	err := client.Reset()
-	if err != nil {
-		return nil, err
+	for _, ns := range namespaces {
+		err := client.Namespace(ns).Reset()
+		if err != nil {
+			return nil, err
+		}
 	}
 
 	return client, nil
 }
 
-func newEmbeddingTestClient() (*Index, error) {
+func newTestClientWithNamespace(ns string) (*Index, error) {
+	client := NewIndex(
+		os.Getenv(UrlEnvProperty),
+		os.Getenv(TokenEnvProperty),
+	)
+
+	for _, ns := range namespaces {
+		err := client.Namespace(ns).Reset()
+		if err != nil {
+			return nil, err
+		}
+	}
+
+	return client.Namespace(ns), nil
+}
+
+func newEmbeddingTestClient(ns string) (*Index, error) {
 	client := NewIndex(
 		os.Getenv("EMBEDDING_"+UrlEnvProperty),
 		os.Getenv("EMBEDDING_"+TokenEnvProperty),
 	)
 
-	err := client.Reset()
-	if err != nil {
-		return nil, err
+	for _, ns := range namespaces {
+		err := client.Namespace(ns).Reset()
+		if err != nil {
+			return nil, err
+		}
 	}
 
-	return client, nil
+	return client.Namespace(ns), nil
 }
 
 func newTestClientWith(client *http.Client) (*Index, error) {
@@ -55,26 +78,36 @@ func newTestClientWith(client *http.Client) (*Index, error) {
 
 	c := NewIndexWith(opts)
 
-	err := c.Reset()
-	if err != nil {
-		return nil, err
+	for _, ns := range namespaces {
+		err := c.Namespace(ns).Reset()
+		if err != nil {
+			return nil, err
+		}
 	}
 
 	return c, nil
 }
 
 func TestNewClient(t *testing.T) {
-	client, err := newTestClient()
-	require.NoError(t, err)
+	for _, ns := range namespaces {
+		t.Run("namespace_"+ns, func(t *testing.T) {
+			client, err := newTestClient()
+			require.NoError(t, err)
 
-	_, err = client.Info()
-	require.NoError(t, err)
+			_, err = client.Info()
+			require.NoError(t, err)
+		})
+	}
 }
 
 func TestNewClientWith(t *testing.T) {
-	client, err := newTestClientWith(&http.Client{})
-	require.NoError(t, err)
+	for _, ns := range namespaces {
+		t.Run("namespace_"+ns, func(t *testing.T) {
+			client, err := newTestClientWith(&http.Client{})
+			require.NoError(t, err)
 
-	_, err = client.Info()
-	require.NoError(t, err)
+			_, err = client.Info()
+			require.NoError(t, err)
+		})
+	}
 }

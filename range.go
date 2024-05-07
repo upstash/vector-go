@@ -10,7 +10,7 @@ const rangePath = "/range"
 // When r.IncludeMetadata is true, metadata of the vectors are also returned,
 // if any.
 func (ix *Index) Range(r Range) (vectors RangeVectors, err error) {
-	data, err := ix.sendJson(rangePath, r)
+	data, err := ix.sendJson(rangePath, r, true)
 	if err != nil {
 		return
 	}

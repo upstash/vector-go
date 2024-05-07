@@ -139,6 +139,16 @@ type IndexInfo struct {
 
 	// Name of the similarity function used in indexing and queries.
 	SimilarityFunction string `json:"similarityFunction"`
+
+	NamespaceInfo map[string]NamespaceInfo `json:"namespaces"`
+}
+
+type NamespaceInfo struct {
+	// The number of vectors in the index.
+	VectorCount int `json:"vectorCount"`
+
+	// The number of vectors that are pending to be indexed.
+	PendingVectorCount int `json:"pendingVectorCount"`
 }
 
 type response[T any] struct {

@@ -7,7 +7,7 @@ const infoPath = "/info"
 // index on disk in bytes, dimension of the index, and
 // the name of the similarity function used.
 func (ix *Index) Info() (info IndexInfo, err error) {
-	data, err := ix.sendJson(infoPath, nil)
+	data, err := ix.sendJson(infoPath, nil, false)
 	if err != nil {
 		return
 	}

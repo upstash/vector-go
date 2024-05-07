@@ -4,9 +4,12 @@ import (
 	"bytes"
 	"encoding/json"
 	"errors"
+	"fmt"
 	"io"
 	"net/http"
+	"net/url"
 	"os"
+	"runtime"
 )
 
 const (
@@ -59,37 +62,45 @@ func NewIndexFromEnv() *Index {
 // with the given options.
 func NewIndexWith(options Options) *Index {
 	options.init()
-	return &Index{
+	index := &Index{
 		url:    options.Url,
 		token:  options.Token,
 		client: options.Client,
 	}
+	index.generateHeaders()
+	return index
 }
 
 // Index is a client for Upstash Vector index.
 type Index struct {
-	url    string
-	token  string
-	client *http.Client
+	url       string
+	token     string
+	client    *http.Client
+	namespace string
+	headers   http.Header
 }
 
-func (ix *Index) sendJson(path string, obj any) (data []byte, err error) {
+func (ix *Index) sendJson(path string, obj any, ns bool) (data []byte, err error) {
 	if data, err = json.Marshal(obj); err != nil {
 		return
 	}
-	return ix.sendBytes(path, data)
+	return ix.sendBytes(path, data, ns)
 }
 
-func (ix *Index) sendBytes(path string, obj []byte) (data []byte, err error) {
-	return ix.send(path, bytes.NewReader(obj))
+func (ix *Index) sendBytes(path string, obj []byte, ns bool) (data []byte, err error) {
+	return ix.send(path, bytes.NewReader(obj), ns)
 }
 
-func (ix *Index) send(path string, r io.Reader) (data []byte, err error) {
-	request, err := http.NewRequest("POST", ix.url+path, r)
+func (ix *Index) send(path string, r io.Reader, ns bool) (data []byte, err error) {
+	url, err := ix.getUrl(path, ns)
+	if err != nil {
+		return nil, err
+	}
+	request, err := http.NewRequest(http.MethodPost, url, r)
 	if err != nil {
 		return
 	}
-	request.Header.Add("Authorization", "Bearer "+ix.token)
+	request.Header = ix.headers
 	response, err := ix.client.Do(request)
 	if err != nil {
 		return
@@ -109,4 +120,28 @@ func parseResponse[T any](data []byte) (t T, err error) {
 		err = errors.New(result.Error)
 	}
 	return
+}
+
+func (ix *Index) getUrl(path string, ns bool) (result string, err error) {
+	if ns {
+		return url.JoinPath(ix.url, path, ix.namespace)
+	} else {
+		return url.JoinPath(ix.url, path)
+	}
+}
+
+func (ix *Index) generateHeaders() {
+	headers := http.Header{}
+	headers.Add("Authorization", "Bearer "+ix.token)
+	headers.Add("Upstash-Telemetry-Runtime", fmt.Sprintf("go@%s", runtime.Version()))
+	var platform string
+	if os.Getenv("VERCEL") != "" {
+		platform = "vercel"
+	} else if os.Getenv("AWS_REGION") != "" {
+		platform = "aws"
+	} else {
+		platform = "unknown"
+	}
+	headers.Add("Upstash-Telemetry-Platform", platform)
+	ix.headers = headers
 }

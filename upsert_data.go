@@ -6,7 +6,7 @@ const upsertDataPath = "/upsert-data"
 // by converting given raw data to an embedding on the server.
 // Additional metadata can also be provided while upserting the vector.
 func (ix *Index) UpsertData(u UpsertData) (err error) {
-	data, err := ix.sendJson(upsertDataPath, u)
+	data, err := ix.sendJson(upsertDataPath, u, true)
 	if err != nil {
 		return
 	}
@@ -18,7 +18,7 @@ func (ix *Index) UpsertData(u UpsertData) (err error) {
 // by converting given raw data to an embedding on the server.
 // Additional metadata can also be provided for each vector.
 func (ix *Index) UpsertDataMany(u []UpsertData) (err error) {
-	data, err := ix.sendJson(upsertDataPath, u)
+	data, err := ix.sendJson(upsertDataPath, u, true)
 	if err != nil {
 		return
 	}

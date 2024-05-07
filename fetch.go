@@ -7,7 +7,7 @@ const fetchPath = "/fetch"
 // returned. When f.IncludeMetadata is true, metadata of the vectors
 // are also returned, if any.
 func (ix *Index) Fetch(f Fetch) (vectors []Vector, err error) {
-	data, err := ix.sendJson(fetchPath, f)
+	data, err := ix.sendJson(fetchPath, f, true)
 	if err != nil {
 		return
 	}

@@ -11,7 +11,7 @@ const queryDataPath = "/query-data"
 // also returned. When q.IncludeMetadata is true, metadata of the vectors are
 // also returned, if any.
 func (ix *Index) QueryData(q QueryData) (scores []VectorScore, err error) {
-	data, err := ix.sendJson(queryDataPath, q)
+	data, err := ix.sendJson(queryDataPath, q, true)
 	if err != nil {
 		return
 	}
