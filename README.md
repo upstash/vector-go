@@ -1,9 +1,12 @@
 # Upstash Vector Go Client
 
+[![Go Reference](https://pkg.go.dev/badge/github.com/upstash/vector-go.svg)](https://pkg.go.dev/github.com/upstash/vector-go)
+
 > [!NOTE]  
 > **This project is in GA Stage.**
 >
-> The Upstash Professional Support fully covers this project. It receives regular updates, and bug fixes. The Upstash team is committed to maintaining and improving its functionality.
+> The Upstash Professional Support fully covers this project. It receives regular updates, and bug fixes. 
+> The Upstash team is committed to maintaining and improving its functionality.
 
 This is the Go client for [Upstash](https://upstash.com/) Vector.
 
@@ -19,10 +22,12 @@ go get github.com/upstash/vector-go
 
 ## Usage
 
+In order to use this client, head out to [Upstash Console](https://console.upstash.com) and create a vector database.
+
 ### Initializing the client
 
-There are two pieces of configuration required to use the Upstash Vector index client: an REST token and REST URL. 
-Find your configuration values in the console dashboard at [https://console.upstash.com/](https://console.upstash.com/).
+The REST token and REST URL configurations are required to initialize an Upstash Vector index client.
+Find your configuration values in the console dashboard at [Upstash Console](https://console.upstash.com/).
 
 ```go
 import (
@@ -80,6 +85,23 @@ func main() {
 
 Upstash vector indexes support operations for working with vector data using operations such as upsert, query, fetch, and delete.
 
+Index operations are associated with a namespace variable.
+You can specify a namespace for an index client with `Namespace(ns string)` function.
+If namespace is not specified, default namespace is used.
+
+```go
+import (
+	"github.com/upstash/vector-go"
+)
+
+func main() {
+	index := vector.NewIndex("<UPSTASH_VECTOR_REST_URL>", "<UPSTASH_VECTOR_REST_TOKEN>")
+	
+	// Returns a new index client associated with namespace "<NAMESPACE>"
+	ns := index.Namespace("<NAMESPACE>")
+}
+```
+
 ### Upserting Vectors
 
 All vectors upserted to index must have the same dimensions.
@@ -87,7 +109,7 @@ All vectors upserted to index must have the same dimensions.
 Upsert can be used to insert new vectors into index or to update
 existing vectors.
 
-#### Upsert many
+#### Upsert Many
 
 ```go
 upserts := []vector.Upsert{
@@ -286,4 +308,24 @@ err := index.Reset()
 
 ```go
 info, err := index.Info()
+```
+
+### List Namespaces
+
+All the names of active namespaces can be listed.
+
+```go
+namespaces, err := index.ListNamespaces()
+for _, ns : range namespaces {
+	fmt.Println(ns)
+}
+```
+
+### Delete Namespaces
+
+A namespace can be deleted entirely if it exists.
+The default namespaces cannot be deleted.
+
+```go
+err := index.DeleteNamespace("ns")
 ```

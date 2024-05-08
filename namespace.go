@@ -5,6 +5,7 @@ import "errors"
 const deleteNamespacePath = "/delete-namespace"
 const listNamespacesPath = "/list-namespaces"
 
+// Namespace returns a new Index client for a specific namespace.
 func (ix *Index) Namespace(ns string) (i *Index) {
 	return &Index{
 		url:       ix.url,

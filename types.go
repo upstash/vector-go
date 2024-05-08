@@ -144,7 +144,7 @@ type IndexInfo struct {
 }
 
 type NamespaceInfo struct {
-	// The number of vectors in the index.
+	// The number of vectors in the namespace of the index.
 	VectorCount int `json:"vectorCount"`
 
 	// The number of vectors that are pending to be indexed.

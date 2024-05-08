@@ -34,12 +34,13 @@ func TestNamespace(t *testing.T) {
 				continue
 			}
 
-			client.DeleteNamespace(ns)
+			err := client.DeleteNamespace(ns)
+			require.NoError(t, err)
 		}
 
-		ns, err := client.ListNamespaces()
+		info, err := client.Info()
 		require.NoError(t, err)
-		require.Exactly(t, []string{""}, ns)
+		require.Exactly(t, 1, len(info.NamespaceInfo))
 	})
 }
 
@@ -61,5 +62,6 @@ func createNamespace(t *testing.T, client *Index, ns string) {
 		return info.PendingVectorCount == 0
 	}, 10*time.Second, 1*time.Second)
 
-	client.Reset()
+	err = client.Reset()
+	require.NoError(t, err)
 }
