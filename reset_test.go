@@ -20,6 +20,7 @@ func TestReset(t *testing.T) {
 			require.NoError(t, err)
 
 			err = client.Reset()
+			require.NoError(t, err)
 
 			require.Eventually(t, func() bool {
 				info, err := client.Info()
