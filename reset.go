@@ -2,10 +2,13 @@ package vector
 
 const resetPath = "/reset"
 
-// Reset deletes all the vectors in the index and resets
-// it to initial state.
+// Reset deletes all the vectors in the default namespace of the index and resets it to initial state.
 func (ix *Index) Reset() (err error) {
-	data, err := ix.send(resetPath, nil)
+	return ix.resetInternal(defaultNamespace)
+}
+
+func (ix *Index) resetInternal(ns string) (err error) {
+	data, err := ix.send(buildPath(resetPath, ns), nil)
 	if err != nil {
 		return
 	}

@@ -4,14 +4,17 @@ import (
 	"bytes"
 	"encoding/json"
 	"errors"
+	"fmt"
 	"io"
 	"net/http"
 	"os"
+	"runtime"
 )
 
 const (
 	UrlEnvProperty   = "UPSTASH_VECTOR_REST_URL"
 	TokenEnvProperty = "UPSTASH_VECTOR_REST_TOKEN"
+	defaultNamespace = ""
 )
 
 type Options struct {
@@ -59,18 +62,21 @@ func NewIndexFromEnv() *Index {
 // with the given options.
 func NewIndexWith(options Options) *Index {
 	options.init()
-	return &Index{
+	index := &Index{
 		url:    options.Url,
 		token:  options.Token,
 		client: options.Client,
 	}
+	index.generateHeaders()
+	return index
 }
 
 // Index is a client for Upstash Vector index.
 type Index struct {
-	url    string
-	token  string
-	client *http.Client
+	url     string
+	token   string
+	client  *http.Client
+	headers http.Header
 }
 
 func (ix *Index) sendJson(path string, obj any) (data []byte, err error) {
@@ -85,11 +91,11 @@ func (ix *Index) sendBytes(path string, obj []byte) (data []byte, err error) {
 }
 
 func (ix *Index) send(path string, r io.Reader) (data []byte, err error) {
-	request, err := http.NewRequest("POST", ix.url+path, r)
+	request, err := http.NewRequest(http.MethodPost, ix.url+path, r)
 	if err != nil {
 		return
 	}
-	request.Header.Add("Authorization", "Bearer "+ix.token)
+	request.Header = ix.headers
 	response, err := ix.client.Do(request)
 	if err != nil {
 		return
@@ -109,4 +115,27 @@ func parseResponse[T any](data []byte) (t T, err error) {
 		err = errors.New(result.Error)
 	}
 	return
+}
+
+func (ix *Index) generateHeaders() {
+	headers := http.Header{}
+	headers.Add("Authorization", "Bearer "+ix.token)
+	headers.Add("Upstash-Telemetry-Runtime", fmt.Sprintf("vector-go@%s", runtime.Version()))
+	var platform string
+	if os.Getenv("VERCEL") != "" {
+		platform = "vercel"
+	} else if os.Getenv("AWS_REGION") != "" {
+		platform = "aws"
+	} else {
+		platform = "unknown"
+	}
+	headers.Add("Upstash-Telemetry-Platform", platform)
+	ix.headers = headers
+}
+
+func buildPath(path string, ns string) string {
+	if ns == "" {
+		return path
+	}
+	return path + "/" + ns
 }
