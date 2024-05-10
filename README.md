@@ -8,7 +8,9 @@
 > The Upstash Professional Support fully covers this project. It receives regular updates, and bug fixes. 
 > The Upstash team is committed to maintaining and improving its functionality.
 
-This is the Go client for [Upstash](https://upstash.com/) Vector.
+[Upstash](https://upstash.com/) Vector is a serverless vector database designed for working with vector embeddings.
+
+This is the HTTP-based Go client for [Upstash](https://upstash.com/) Vector.
 
 ## Documentation
 
@@ -16,8 +18,15 @@ This is the Go client for [Upstash](https://upstash.com/) Vector.
 
 ## Installation
 
+Use `go get` to install the Upstash Vector package:
 ```bash
 go get github.com/upstash/vector-go
+```
+
+Import the Upstash Vector package in your project:
+
+```go
+import "github.com/upstash/vector-go"
 ```
 
 ## Usage
@@ -85,9 +94,22 @@ func main() {
 
 Upstash vector indexes support operations for working with vector data using operations such as upsert, query, fetch, and delete.
 
-Index operations are associated with a namespace variable.
+```go
+import (
+	"github.com/upstash/vector-go"
+)
+
+func main() {
+	index := vector.NewIndex("<UPSTASH_VECTOR_REST_URL>", "<UPSTASH_VECTOR_REST_TOKEN>")
+}
+```
+
+Upstash Vector allows you to partition a single index into multiple isolated namespaces.
+
 You can specify a namespace for an index client with `Namespace(ns string)` function.
-If namespace is not specified, default namespace is used.
+When you create a `Namespace` client, all index operations executed through this client become associated with the specified namespace.
+
+By default, the `Index` client is associated with the default namespace.
 
 ```go
 import (
@@ -97,9 +119,8 @@ import (
 func main() {
 	index := vector.NewIndex("<UPSTASH_VECTOR_REST_URL>", "<UPSTASH_VECTOR_REST_TOKEN>")
 	
-	// Returns a new index client associated with namespace "<NAMESPACE>"
+	// Returns a new Namespace client associated with the given namespace
 	ns := index.Namespace("<NAMESPACE>")
-}
 ```
 
 ### Upserting Vectors
@@ -327,5 +348,5 @@ A namespace can be deleted entirely if it exists.
 The default namespaces cannot be deleted.
 
 ```go
-err := index.DeleteNamespace("ns")
+err := index.Namespace("ns").DeleteNamespace()
 ```

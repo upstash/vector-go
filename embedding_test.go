@@ -9,14 +9,15 @@ import (
 func TestEmbedding(t *testing.T) {
 	for _, ns := range namespaces {
 		t.Run("namespace_"+ns, func(t *testing.T) {
-			client, err := newEmbeddingTestClient(ns)
+			client, err := newEmbeddingTestClient()
 			require.NoError(t, err)
 
+			namespace := client.Namespace(ns)
 			id0 := "tr"
 			id1 := "jp"
 			id2 := "uk"
 			id3 := "fr"
-			err = client.UpsertDataMany([]UpsertData{
+			err = namespace.UpsertDataMany([]UpsertData{
 				{
 					Id:       id0,
 					Data:     "Capital of Türkiye is Ankara.",
@@ -47,7 +48,7 @@ func TestEmbedding(t *testing.T) {
 			}, 10*time.Second, 1*time.Second)
 
 			t.Run("score", func(t *testing.T) {
-				scores, err := client.QueryData(QueryData{
+				scores, err := namespace.QueryData(QueryData{
 					Data: "where is the capital of Japan?",
 					TopK: 1,
 				})
@@ -57,7 +58,7 @@ func TestEmbedding(t *testing.T) {
 			})
 
 			t.Run("with metadata", func(t *testing.T) {
-				scores, err := client.QueryData(QueryData{
+				scores, err := namespace.QueryData(QueryData{
 					Data:            "Which country's capital is Ankara?",
 					TopK:            1,
 					IncludeMetadata: true,
@@ -76,7 +77,7 @@ func TestEmbedding(t *testing.T) {
 					Filter:          `country = 'fr'`,
 				}
 
-				scores, err := client.QueryData(query)
+				scores, err := namespace.QueryData(query)
 				require.NoError(t, err)
 				require.Equal(t, 1, len(scores))
 				require.Equal(t, id3, scores[0].Id)

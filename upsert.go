@@ -2,11 +2,20 @@ package vector
 
 const upsertPath = "/upsert"
 
-// Upsert updates or inserts a vector to a namespace of the index.
+// Upsert updates or inserts a vector to the default namespace of the index.
 // Additional metadata can also be provided while upserting the vector.
-// If namespace is not specified, the default namespace is used.
 func (ix *Index) Upsert(u Upsert) (err error) {
-	data, err := ix.sendJson(upsertPath, u, true)
+	return ix.upsertInternal(u, "")
+}
+
+// UpsertMany updates or inserts some vectors to the default namespace of the index.
+// Additional metadata can also be provided for each vector.
+func (ix *Index) UpsertMany(u []Upsert) (err error) {
+	return ix.upsertManyInternal(u, "")
+}
+
+func (ix *Index) upsertInternal(u Upsert, ns string) (err error) {
+	data, err := ix.sendJson(buildPath(upsertPath, ns), u)
 	if err != nil {
 		return
 	}
@@ -14,11 +23,8 @@ func (ix *Index) Upsert(u Upsert) (err error) {
 	return
 }
 
-// UpsertMany updates or inserts some vectors to a namespace of the index.
-// Additional metadata can also be provided for each vector.
-// If namespace is not specified, the default namespace is used.
-func (ix *Index) UpsertMany(u []Upsert) (err error) {
-	data, err := ix.sendJson(upsertPath, u, true)
+func (ix *Index) upsertManyInternal(u []Upsert, ns string) (err error) {
+	data, err := ix.sendJson(buildPath(upsertPath, ns), u)
 	if err != nil {
 		return
 	}

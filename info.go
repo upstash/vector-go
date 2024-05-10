@@ -10,7 +10,7 @@ const infoPath = "/info"
 //   - Similarity function used
 //   - per-namespace vector and pending vector counts
 func (ix *Index) Info() (info IndexInfo, err error) {
-	data, err := ix.sendJson(infoPath, nil, false)
+	data, err := ix.sendJson(infoPath, nil)
 	if err != nil {
 		return
 	}

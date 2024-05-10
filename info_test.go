@@ -19,11 +19,11 @@ func TestInfo(t *testing.T) {
 	require.Equal(t, info.VectorCount, 0)
 	require.Equal(t, 2, info.Dimension)
 	require.Equal(t, "COSINE", info.SimilarityFunction)
-	require.Equal(t, len(namespaces), len(info.NamespaceInfo))
+	require.Equal(t, len(namespaces), len(info.Namespaces))
 	for _, ns := range namespaces {
-		require.Contains(t, info.NamespaceInfo, ns)
-		require.Equal(t, 0, info.NamespaceInfo[ns].VectorCount)
-		require.Equal(t, 0, info.NamespaceInfo[ns].PendingVectorCount)
+		require.Contains(t, info.Namespaces, ns)
+		require.Equal(t, 0, info.Namespaces[ns].VectorCount)
+		require.Equal(t, 0, info.Namespaces[ns].PendingVectorCount)
 	}
 
 	for _, ns := range namespaces {

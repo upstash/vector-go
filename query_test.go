@@ -9,13 +9,14 @@ import (
 func TestQuery(t *testing.T) {
 	for _, ns := range namespaces {
 		t.Run("namespace_"+ns, func(t *testing.T) {
-			client, err := newTestClientWithNamespace(ns)
+			client, err := newTestClient()
 			require.NoError(t, err)
 
+			namespace := client.Namespace(ns)
 			id0 := randomString()
 			id1 := randomString()
 			id2 := randomString()
-			err = client.UpsertMany([]Upsert{
+			err = namespace.UpsertMany([]Upsert{
 				{
 					Id:       id0,
 					Vector:   []float32{0, 1},
@@ -40,7 +41,7 @@ func TestQuery(t *testing.T) {
 			}, 10*time.Second, 1*time.Second)
 
 			t.Run("score", func(t *testing.T) {
-				scores, err := client.Query(Query{
+				scores, err := namespace.Query(Query{
 					Vector: []float32{0, 1},
 					TopK:   2,
 				})
@@ -52,7 +53,7 @@ func TestQuery(t *testing.T) {
 			})
 
 			t.Run("with metadata and vectors", func(t *testing.T) {
-				scores, err := client.Query(Query{
+				scores, err := namespace.Query(Query{
 					Vector:          []float32{0, 1},
 					TopK:            2,
 					IncludeMetadata: true,
@@ -78,7 +79,7 @@ func TestQuery(t *testing.T) {
 					Filter:          `foo = 'bar'`,
 				}
 
-				scores, err := client.Query(query)
+				scores, err := namespace.Query(query)
 				require.NoError(t, err)
 				require.Equal(t, 1, len(scores))
 				require.Equal(t, id0, scores[0].Id)
@@ -87,7 +88,7 @@ func TestQuery(t *testing.T) {
 				require.Equal(t, []float32{0, 1}, scores[0].Vector)
 
 				query.Filter = `foo = 'nay'`
-				scores, err = client.Query(query)
+				scores, err = namespace.Query(query)
 				require.NoError(t, err)
 				require.Equal(t, 1, len(scores))
 				require.Equal(t, id2, scores[0].Id)

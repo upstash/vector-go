@@ -140,7 +140,8 @@ type IndexInfo struct {
 	// Name of the similarity function used in indexing and queries.
 	SimilarityFunction string `json:"similarityFunction"`
 
-	NamespaceInfo map[string]NamespaceInfo `json:"namespaces"`
+	// Per-namespace vector and pending vector counts
+	Namespaces map[string]NamespaceInfo `json:"namespaces"`
 }
 
 type NamespaceInfo struct {

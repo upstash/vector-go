@@ -37,7 +37,7 @@ func newTestClient() (*Index, error) {
 	return client, nil
 }
 
-func newTestClientWithNamespace(ns string) (*Index, error) {
+func newTestClientWithNamespace(ns string) (*Namespace, error) {
 	client := NewIndex(
 		os.Getenv(UrlEnvProperty),
 		os.Getenv(TokenEnvProperty),
@@ -53,7 +53,7 @@ func newTestClientWithNamespace(ns string) (*Index, error) {
 	return client.Namespace(ns), nil
 }
 
-func newEmbeddingTestClient(ns string) (*Index, error) {
+func newEmbeddingTestClient() (*Index, error) {
 	client := NewIndex(
 		os.Getenv("EMBEDDING_"+UrlEnvProperty),
 		os.Getenv("EMBEDDING_"+TokenEnvProperty),
@@ -66,7 +66,7 @@ func newEmbeddingTestClient(ns string) (*Index, error) {
 		}
 	}
 
-	return client.Namespace(ns), nil
+	return client, nil
 }
 
 func newTestClientWith(client *http.Client) (*Index, error) {

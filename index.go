@@ -7,7 +7,6 @@ import (
 	"fmt"
 	"io"
 	"net/http"
-	"net/url"
 	"os"
 	"runtime"
 )
@@ -80,23 +79,19 @@ type Index struct {
 	headers   http.Header
 }
 
-func (ix *Index) sendJson(path string, obj any, ns bool) (data []byte, err error) {
+func (ix *Index) sendJson(path string, obj any) (data []byte, err error) {
 	if data, err = json.Marshal(obj); err != nil {
 		return
 	}
-	return ix.sendBytes(path, data, ns)
+	return ix.sendBytes(path, data)
 }
 
-func (ix *Index) sendBytes(path string, obj []byte, ns bool) (data []byte, err error) {
-	return ix.send(path, bytes.NewReader(obj), ns)
+func (ix *Index) sendBytes(path string, obj []byte) (data []byte, err error) {
+	return ix.send(path, bytes.NewReader(obj))
 }
 
-func (ix *Index) send(path string, r io.Reader, ns bool) (data []byte, err error) {
-	url, err := ix.getUrl(path, ns)
-	if err != nil {
-		return nil, err
-	}
-	request, err := http.NewRequest(http.MethodPost, url, r)
+func (ix *Index) send(path string, r io.Reader) (data []byte, err error) {
+	request, err := http.NewRequest(http.MethodPost, ix.url+path, r)
 	if err != nil {
 		return
 	}
@@ -122,18 +117,10 @@ func parseResponse[T any](data []byte) (t T, err error) {
 	return
 }
 
-func (ix *Index) getUrl(path string, ns bool) (result string, err error) {
-	if ns {
-		return url.JoinPath(ix.url, path, ix.namespace)
-	} else {
-		return url.JoinPath(ix.url, path)
-	}
-}
-
 func (ix *Index) generateHeaders() {
 	headers := http.Header{}
 	headers.Add("Authorization", "Bearer "+ix.token)
-	headers.Add("Upstash-Telemetry-Runtime", fmt.Sprintf("go@%s", runtime.Version()))
+	headers.Add("Upstash-Telemetry-Runtime", fmt.Sprintf("vector-go@%s", runtime.Version()))
 	var platform string
 	if os.Getenv("VERCEL") != "" {
 		platform = "vercel"
@@ -144,4 +131,11 @@ func (ix *Index) generateHeaders() {
 	}
 	headers.Add("Upstash-Telemetry-Platform", platform)
 	ix.headers = headers
+}
+
+func buildPath(path string, ns string) string {
+	if ns == "" {
+		return path
+	}
+	return path + "/" + ns
 }

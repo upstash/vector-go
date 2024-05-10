@@ -7,10 +7,13 @@ const rangePath = "/range"
 // The initial cursor should be set to "0", and subsequent calls to
 // Range might use the next cursor returned in the response.
 // When r.IncludeVectors is true, values of the vectors are also returned.
-// When r.IncludeMetadata is true, metadata of the vectors are also returned,
-// if any.
+// When r.IncludeMetadata is true, metadata of the vectors are also returned, if any.
 func (ix *Index) Range(r Range) (vectors RangeVectors, err error) {
-	data, err := ix.sendJson(rangePath, r, true)
+	return ix.rangeInternal(r, "")
+}
+
+func (ix *Index) rangeInternal(r Range, ns string) (vectors RangeVectors, err error) {
+	data, err := ix.sendJson(buildPath(rangePath, ns), r)
 	if err != nil {
 		return
 	}

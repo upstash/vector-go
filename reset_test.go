@@ -9,17 +9,18 @@ import (
 func TestReset(t *testing.T) {
 	for _, ns := range namespaces {
 		t.Run("namespace_"+ns, func(t *testing.T) {
-			client, err := newTestClientWithNamespace(ns)
+			client, err := newTestClient()
 			require.NoError(t, err)
 
+			namespace := client.Namespace(ns)
 			id := randomString()
-			err = client.Upsert(Upsert{
+			err = namespace.Upsert(Upsert{
 				Id:     id,
 				Vector: []float32{0, 1},
 			})
 			require.NoError(t, err)
 
-			err = client.Reset()
+			err = namespace.Reset()
 			require.NoError(t, err)
 
 			require.Eventually(t, func() bool {
