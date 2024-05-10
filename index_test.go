@@ -11,7 +11,7 @@ import (
 )
 
 var (
-	namespaces = [...]string{"", "ns"}
+	namespaces = [...]string{defaultNamespace, "ns"}
 )
 
 func init() {

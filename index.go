@@ -14,6 +14,7 @@ import (
 const (
 	UrlEnvProperty   = "UPSTASH_VECTOR_REST_URL"
 	TokenEnvProperty = "UPSTASH_VECTOR_REST_TOKEN"
+	defaultNamespace = ""
 )
 
 type Options struct {
@@ -72,11 +73,10 @@ func NewIndexWith(options Options) *Index {
 
 // Index is a client for Upstash Vector index.
 type Index struct {
-	url       string
-	token     string
-	client    *http.Client
-	namespace string
-	headers   http.Header
+	url     string
+	token   string
+	client  *http.Client
+	headers http.Header
 }
 
 func (ix *Index) sendJson(path string, obj any) (data []byte, err error) {

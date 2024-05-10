@@ -4,7 +4,7 @@ const resetPath = "/reset"
 
 // Reset deletes all the vectors in the default namespace of the index and resets it to initial state.
 func (ix *Index) Reset() (err error) {
-	return ix.resetInternal("")
+	return ix.resetInternal(defaultNamespace)
 }
 
 func (ix *Index) resetInternal(ns string) (err error) {

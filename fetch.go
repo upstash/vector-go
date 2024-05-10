@@ -6,7 +6,7 @@ const fetchPath = "/fetch"
 // If IncludeVectors is set to true, the vector values are also returned.
 // If IncludeMetadata is set to true, any associated metadata of the vectors is also returned, if any.
 func (ix *Index) Fetch(f Fetch) (vectors []Vector, err error) {
-	return ix.fetchInternal(f, "")
+	return ix.fetchInternal(f, defaultNamespace)
 }
 
 func (ix *Index) fetchInternal(f Fetch, ns string) (vectors []Vector, err error) {

@@ -9,7 +9,7 @@ const queryPath = "/query"
 // When q.IncludeVectors is true, values of the vectors are also returned.
 // When q.IncludeMetadata is true, metadata of the vectors are also returned, if any.
 func (ix *Index) Query(q Query) (scores []VectorScore, err error) {
-	return ix.queryInternal(q, "")
+	return ix.queryInternal(q, defaultNamespace)
 }
 
 func (ix *Index) queryInternal(q Query, ns string) (scores []VectorScore, err error) {

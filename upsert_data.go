@@ -6,14 +6,14 @@ const upsertDataPath = "/upsert-data"
 // by converting given raw data to an embedding on the server.
 // Additional metadata can also be provided while upserting the vector.
 func (ix *Index) UpsertData(u UpsertData) (err error) {
-	return ix.upsertDataInternal(u, "")
+	return ix.upsertDataInternal(u, defaultNamespace)
 }
 
 // UpsertDataMany updates or inserts some vectors to the default namespace of the index
 // by converting given raw data to an embedding on the server.
 // Additional metadata can also be provided for each vector.
 func (ix *Index) UpsertDataMany(u []UpsertData) (err error) {
-	return ix.upsertDataManyInternal(u, "")
+	return ix.upsertDataManyInternal(u, defaultNamespace)
 }
 
 func (ix *Index) upsertDataInternal(u UpsertData, ns string) (err error) {
