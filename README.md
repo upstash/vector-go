@@ -142,6 +142,7 @@ upserts := []vector.Upsert{
         Id:       "1",
         Vector:   []float32{0.0, 1.0},
         Metadata: map[string]any{"foo": "bar"}, // optional metadata
+        Data: "vector data", // optional data
     },
 }
 
@@ -205,12 +206,15 @@ When `IncludeVectors` is `true`, the response will contain the vector values.
 When `IncludeMetadata` is `true`, the response will contain the metadata of the
 vectors, if any.
 
+When `IncludeData` is `true`, the response will contain the data of the vectors, if any.
+
 ```go
 scores, err := index.Query(vector.Query{
     Vector:          []float32{0.0, 1.0},
     TopK:            2,
     IncludeVectors:  false,
     IncludeMetadata: false,
+    IncludeData: false,
 })
 ```
 
@@ -224,6 +228,7 @@ scores, err := index.Query(vector.Query{
     TopK:            2,
     IncludeVectors:  false,
     IncludeMetadata: false,
+    IncludeData: false,
     Filter: `foo = 'bar'`
 })
 ```
@@ -240,12 +245,15 @@ When `IncludeVectors` is `true`, the response will contain the vector values.
 When `IncludeMetadata` is `true`, the response will contain the metadata of the
 vectors, if any.
 
+When `IncludeData` is `true`, the response will contain the data of the vectors, if any.
+
 ```go
 scores, err := index.QueryData(vector.QueryData{
     Data:            "Where is the capital of Turkey?",
     TopK:            2,
     IncludeVectors:  false,
     IncludeMetadata: false,
+    IncludeData: false,
     Filter: `foo = 'bar'`
 })
 ```
@@ -259,11 +267,14 @@ When `IncludeVectors` is `true`, the response will contain the vector values.
 When `IncludeMetadata` is `true`, the response will contain the metadata of the
 vectors, if any.
 
+When `IncludeData` is `true`, the response will contain the data of the vectors, if any.
+
 ```go
 vectors, err := index.Fetch(vector.Fetch{
     Ids: []string{"0", "1"},
     IncludeVectors: false,
     IncludeMetadata: false,
+    IncludeData: false,
 })
 ```
 
@@ -294,12 +305,15 @@ When `IncludeVectors` is `true`, the response will contain the vector values.
 When `IncludeMetadata` is `true`, the response will contain the metadata of the
 vectors, if any.
 
+When `IncludeData` is `true`, the response will contain the data of the vectors, if any.
+
 ```go
 vectors, err := index.Range(vector.Range{
     Cursor:          "0",
     Limit:           10,
     IncludeVectors:  false,
     IncludeMetadata: false,
+    IncludeData: false,
 })
 
 for vectors.NextCursor != "" {
@@ -313,6 +327,7 @@ for vectors.NextCursor != "" {
         Limit:           10,
         IncludeVectors:  false,
         IncludeMetadata: false,
+        IncludeData: false,
     })
 }
 ```

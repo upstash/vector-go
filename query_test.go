@@ -1,9 +1,10 @@
 package vector
 
 import (
-	"github.com/stretchr/testify/require"
 	"testing"
 	"time"
+
+	"github.com/stretchr/testify/require"
 )
 
 func TestQuery(t *testing.T) {
@@ -21,10 +22,12 @@ func TestQuery(t *testing.T) {
 					Id:       id0,
 					Vector:   []float32{0, 1},
 					Metadata: map[string]any{"foo": "bar"},
+					Data:     "vector0 data",
 				},
 				{
 					Id:     id1,
 					Vector: []float32{5, 10},
+					Data:   "vector1 data",
 				},
 				{
 					Id:       id2,
@@ -58,16 +61,20 @@ func TestQuery(t *testing.T) {
 					TopK:            2,
 					IncludeMetadata: true,
 					IncludeVectors:  true,
+					IncludeData:     true,
 				})
 				require.NoError(t, err)
 				require.Equal(t, 2, len(scores))
 				require.Equal(t, id0, scores[0].Id)
 				require.Equal(t, float32(1.0), scores[0].Score)
 				require.Equal(t, map[string]any{"foo": "bar"}, scores[0].Metadata)
+				require.Equal(t, "vector0 data", scores[0].Data)
 				require.Equal(t, []float32{0, 1}, scores[0].Vector)
 
 				require.Equal(t, id2, scores[1].Id)
 				require.Equal(t, []float32{0.01, 1.01}, scores[1].Vector)
+				require.Equal(t, map[string]any{"foo": "nay"}, scores[1].Metadata)
+				require.Empty(t, scores[1].Data)
 			})
 
 			t.Run("with metadata filtering", func(t *testing.T) {
@@ -76,6 +83,7 @@ func TestQuery(t *testing.T) {
 					TopK:            10,
 					IncludeMetadata: true,
 					IncludeVectors:  true,
+					IncludeData:     true,
 					Filter:          `foo = 'bar'`,
 				}
 
@@ -85,6 +93,7 @@ func TestQuery(t *testing.T) {
 				require.Equal(t, id0, scores[0].Id)
 				require.Equal(t, float32(1.0), scores[0].Score)
 				require.Equal(t, map[string]any{"foo": "bar"}, scores[0].Metadata)
+				require.Equal(t, "vector0 data", scores[0].Data)
 				require.Equal(t, []float32{0, 1}, scores[0].Vector)
 
 				query.Filter = `foo = 'nay'`
@@ -94,6 +103,7 @@ func TestQuery(t *testing.T) {
 				require.Equal(t, id2, scores[0].Id)
 				require.Equal(t, map[string]any{"foo": "nay"}, scores[0].Metadata)
 				require.Equal(t, []float32{0.01, 1.01}, scores[0].Vector)
+				require.Empty(t, scores[0].Data)
 			})
 		})
 	}

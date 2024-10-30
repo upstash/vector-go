@@ -7,6 +7,9 @@ type Upsert struct {
 	// Vector values.
 	Vector []float32 `json:"vector"`
 
+	// Optional data of the vector.
+	Data string `json:"data,omitempty"`
+
 	// Optional metadata of the vector.
 	Metadata map[string]any `json:"metadata,omitempty"`
 }
@@ -37,6 +40,9 @@ type Query struct {
 	// Whether to include metadata in the query response, if any.
 	IncludeMetadata bool `json:"includeMetadata,omitempty"`
 
+	// Whether to include data in the query response, if any.
+	IncludeData bool `json:"includeData,omitempty"`
+
 	// Query filter
 	Filter any `json:"filter,omitempty"`
 }
@@ -56,6 +62,9 @@ type QueryData struct {
 	// Whether to include metadata in the query response, if any.
 	IncludeMetadata bool `json:"includeMetadata,omitempty"`
 
+	// Whether to include data in the query response, if any.
+	IncludeData bool `json:"includeData,omitempty"`
+
 	// Query filter
 	Filter any `json:"filter,omitempty"`
 }
@@ -69,6 +78,9 @@ type Vector struct {
 
 	// Optional metadata of the vector, if any.
 	Metadata map[string]any `json:"metadata,omitempty"`
+
+	// Optional data of the vector.
+	Data string `json:"data,omitempty"`
 }
 
 type VectorScore struct {
@@ -84,6 +96,9 @@ type VectorScore struct {
 
 	// Optional metadata of the vector, if any.
 	Metadata map[string]any `json:"metadata,omitempty"`
+
+	// Optional data of the vector.
+	Data string `json:"data,omitempty"`
 }
 
 type Fetch struct {
@@ -95,6 +110,9 @@ type Fetch struct {
 
 	// Whether to include metadata in the fetch response, if any.
 	IncludeMetadata bool `json:"includeMetadata,omitempty"`
+
+	// Whether to include data in the query response, if any.
+	IncludeData bool `json:"includeData,omitempty"`
 }
 
 type Range struct {
@@ -110,6 +128,9 @@ type Range struct {
 
 	// Whether to include metadata in the fetch response, if any.
 	IncludeMetadata bool `json:"includeMetadata,omitempty"`
+
+	// Whether to include data in the query response, if any.
+	IncludeData bool `json:"includeData,omitempty"`
 }
 
 type RangeVectors struct {

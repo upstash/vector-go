@@ -1,8 +1,9 @@
 package vector
 
 import (
-	"github.com/stretchr/testify/require"
 	"testing"
+
+	"github.com/stretchr/testify/require"
 )
 
 func TestUpsert(t *testing.T) {
@@ -57,6 +58,7 @@ func TestUpsert(t *testing.T) {
 					Id:       id,
 					Vector:   []float32{0, 1},
 					Metadata: map[string]any{"foo": "bar"},
+					Data:     "some data",
 				})
 				require.NoError(t, err)
 
@@ -64,12 +66,14 @@ func TestUpsert(t *testing.T) {
 					Ids:             []string{id},
 					IncludeMetadata: true,
 					IncludeVectors:  true,
+					IncludeData:     true,
 				})
 				require.NoError(t, err)
 				require.Equal(t, 1, len(vectors))
 				require.Equal(t, id, vectors[0].Id)
 				require.Equal(t, map[string]any{"foo": "bar"}, vectors[0].Metadata)
 				require.Equal(t, []float32{0, 1}, vectors[0].Vector)
+				require.Equal(t, "some data", vectors[0].Data)
 			})
 		})
 	}

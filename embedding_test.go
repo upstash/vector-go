@@ -1,9 +1,10 @@
 package vector
 
 import (
-	"github.com/stretchr/testify/require"
 	"testing"
 	"time"
+
+	"github.com/stretchr/testify/require"
 )
 
 func TestEmbedding(t *testing.T) {
@@ -62,11 +63,13 @@ func TestEmbedding(t *testing.T) {
 					Data:            "Which country's capital is Ankara?",
 					TopK:            1,
 					IncludeMetadata: true,
+					IncludeData:     true,
 				})
 				require.NoError(t, err)
 				require.Equal(t, 1, len(scores))
 				require.Equal(t, id0, scores[0].Id)
 				require.Equal(t, map[string]any{"country": "tr", "capital": "Ankara"}, scores[0].Metadata)
+				require.Equal(t, "Capital of Türkiye is Ankara.", scores[0].Data)
 			})
 
 			t.Run("with metadata filtering", func(t *testing.T) {
@@ -74,6 +77,7 @@ func TestEmbedding(t *testing.T) {
 					Data:            "Where is the capital of France?",
 					TopK:            1,
 					IncludeMetadata: true,
+					IncludeData:     true,
 					Filter:          `country = 'fr'`,
 				}
 
@@ -82,6 +86,7 @@ func TestEmbedding(t *testing.T) {
 				require.Equal(t, 1, len(scores))
 				require.Equal(t, id3, scores[0].Id)
 				require.Equal(t, map[string]any{"country": "fr", "capital": "Paris"}, scores[0].Metadata)
+				require.Equal(t, "Capital of France is Paris.", scores[0].Data)
 			})
 		})
 	}
