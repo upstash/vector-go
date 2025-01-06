@@ -17,7 +17,7 @@ func randomString() string {
 func TestDelete(t *testing.T) {
 	for _, ns := range namespaces {
 		t.Run("namespace_"+ns, func(t *testing.T) {
-			client, err := newTestClientWithNamespace(ns)
+			client, err := newTestClient(testClientTypeDense, ns)
 			require.NoError(t, err)
 			id := randomString()
 			err = client.Upsert(Upsert{
@@ -44,7 +44,7 @@ func TestDelete(t *testing.T) {
 func TestDeleteMany(t *testing.T) {
 	for _, ns := range namespaces {
 		t.Run("namespace "+ns, func(t *testing.T) {
-			client, err := newTestClientWithNamespace(ns)
+			client, err := newTestClient(testClientTypeDense, ns)
 			require.NoError(t, err)
 
 			id0 := randomString()

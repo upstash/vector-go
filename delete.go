@@ -19,8 +19,12 @@ func (ix *Index) deleteInternal(id string, ns string) (ok bool, err error) {
 		return
 	}
 
-	deleted, err := parseResponse[deleted](data)
-	ok = deleted.Deleted != 0
+	res, err := parseResponse[deleted](data)
+	if err != nil {
+		return
+	}
+
+	ok = res.Deleted != 0
 	return
 }
 
@@ -30,7 +34,11 @@ func (ix *Index) deleteManyInternal(ids []string, ns string) (count int, err err
 		return
 	}
 
-	deleted, err := parseResponse[deleted](data)
-	count = deleted.Deleted
+	res, err := parseResponse[deleted](data)
+	if err != nil {
+		return
+	}
+
+	count = res.Deleted
 	return
 }
