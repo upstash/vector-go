@@ -110,3 +110,28 @@ func (ns *Namespace) DeleteMany(ids []string) (count int, err error) {
 func (ns *Namespace) Reset() (err error) {
 	return ns.index.resetInternal(ns.ns)
 }
+
+// Update updates a vector value, data, or metadata for the given id
+// in the namespace and reports whether the vector is updated.
+// If a vector with the given id is not found, Update returns false.
+func (ns *Namespace) Update(u Update) (ok bool, err error) {
+	return ns.index.updateInternal(u, ns.ns)
+}
+
+// ResumableQuery starts a resumable query and returns the first page of the
+// result of the query for the given vector in the default namespace.
+// Then, next pages of the query results can be fetched over the returned handle.
+// After all the needed pages of the results are fetched, it is recommended
+// to close to handle to release the acquired resources.
+func (ns *Namespace) ResumableQuery(q ResumableQuery) (scores []VectorScore, handle *ResumableQueryHandle, err error) {
+	return ns.index.resumableQueryInternal(q, ns.ns)
+}
+
+// ResumableQueryData starts a resumable query and returns the first page of the
+// result of the query for the given text data in the default namespace.
+// Then, next pages of the query results can be fetched over the returned handle.
+// After all the needed pages of the results are fetched, it is recommended
+// to close to handle to release the acquired resources.
+func (ns *Namespace) ResumableQueryData(q ResumableQueryData) (scores []VectorScore, handle *ResumableQueryHandle, err error) {
+	return ns.index.resumableQueryDataInternal(q, ns.ns)
+}

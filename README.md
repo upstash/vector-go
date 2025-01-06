@@ -125,7 +125,112 @@ func main() {
 
 ### Upserting Vectors
 
-All vectors upserted to index must have the same dimensions.
+Upsert can be used to insert new vectors into index or to update
+existing vectors.
+
+#### Upsert Many
+
+**Dense Indexes**
+
+```go
+err := index.UpsertMany([]vector.Upsert{
+	{
+		Id:     "0",
+		Vector: []float32{0.6, 0.8},
+	},
+	{
+		Id:       "1",
+		Vector:   []float32{0.0, 1.0},
+		Metadata: map[string]any{"foo": "bar"}, // optional metadata
+		Data:     "vector data",                // optional data
+	},
+})
+```
+
+**Sparse Indexes**
+```go
+err := index.UpsertMany([]vector.Upsert{
+	{
+		Id: "0",
+		SparseVector: &vector.SparseVector{
+			Indices: []int32{0, 1},
+			Values:  []float32{0.5, 0.6},
+		},
+	},
+	{
+		Id: "1",
+		SparseVector: &vector.SparseVector{
+			Indices: []int32{5},
+			Values:  []float32{0.1},
+		},
+		Metadata: map[string]any{"foo": "bar"}, // optional metadata
+		Data:     "vector data",                // optional data
+	},
+})
+```
+
+**Hybrid Indexes**
+```go
+err = index.UpsertMany([]vector.Upsert{
+	{
+		Id:     "0",
+		Vector: []float32{0.6, 0.8},
+		SparseVector: &vector.SparseVector{
+			Indices: []int32{0, 1},
+			Values:  []float32{0.5, 0.6},
+		},
+	},
+	{
+		Id:     "1",
+		Vector: []float32{0.0, 1.0},
+		SparseVector: &vector.SparseVector{
+			Indices: []int32{5},
+			Values:  []float32{0.1},
+		},
+		Metadata: map[string]any{"foo": "bar"}, // optional metadata
+		Data:     "vector data",                // optional data
+	},
+})
+```
+
+#### Upsert One
+
+**Dense Indexes**
+```go
+err := index.Upsert(vector.Upsert{
+	Id:     "2",
+	Vector: []float32{1.0, 0.0},
+})
+```
+
+**Sparse Indexes**
+```go
+err = index.Upsert(vector.Upsert{
+	Id: "2",
+	SparseVector: &vector.SparseVector{
+		Indices: []int32{0, 1},
+		Values:  []float32{0.5, 0.6},
+	},
+})
+```
+
+**Hybrid Indexes**
+```go
+err = index.Upsert(vector.Upsert{
+	Id:     "2",
+	Vector: []float32{1.0, 0.0},
+	SparseVector: &vector.SparseVector{
+		Indices: []int32{0, 1},
+		Values:  []float32{0.5, 0.6},
+	},
+})
+```
+
+### Upserting with Raw Data
+
+If the vector index is created with an embedding model, it can be populated using the raw data
+without explicitly converting it to an embedding. Upstash server will create the embedding 
+and index the generated vectors.
 
 Upsert can be used to insert new vectors into index or to update
 existing vectors.
@@ -133,71 +238,29 @@ existing vectors.
 #### Upsert Many
 
 ```go
-upserts := []vector.Upsert{
-    {
-        Id:     "0",
-        Vector: []float32{0.6, 0.8},
-    },
-    {
-        Id:       "1",
-        Vector:   []float32{0.0, 1.0},
-        Metadata: map[string]any{"foo": "bar"}, // optional metadata
-        Data: "vector data", // optional data
-    },
-}
-
-err := index.UpsertMany(upserts)
-```
-
-#### Upsert One
-
-```go
-err := index.Upsert(vector.Upsert{
-    Id:     "2",
-    Vector: []float32{1.0, 0.0},
+err := index.UpsertDataMany([]vector.UpsertData{
+	{
+		Id:   "0",
+		Data: "Capital of Turkey is Ankara.",
+	},
+	{
+		Id:       "1",
+		Data:     "Capital of Japan is Tokyo.",
+		Metadata: map[string]any{"foo": "bar"}, // optional metadata
+	},
 })
-```
-
-### Upserting with Raw Data
-
-If the vector index is created with a predefined embedding model, it can be populated using the raw data
-without explicitly converting it to an embedding. Upstash server will create the embedding 
-and index the generated vectors.
-
-Upsert can be used to insert new vectors into index or to update
-existing vectors.
-
-#### Upsert many
-
-```go
-upserts := []vector.UpsertData{
-    {
-        Id:     "0",
-        Data:   "Capital of Turkey is Ankara.",
-    },
-    {
-        Id:       "1",
-        Data:     "Capital of Japan is Tokyo.",
-        Metadata: map[string]any{"foo": "bar"}, // optional metadata
-    },
-}
-
-err := index.UpsertDataMany(upserts)
 ```
 
 #### Upsert One
 
 ```go
 err := index.UpsertData(vector.UpsertData{
-    Id:     "2",
-    Data:   "Capital of Turkey is Ankara.",
+	Id:   "2",
+	Data: "Capital of Turkey is Ankara.",
 })
 ```
 
 ### Querying Vectors
-
-The query vector must be present, and it must have the same dimensions with the
-all the other vectors in the index.
 
 When `TopK` is specified, at most that many vectors will be returned.
 
@@ -208,13 +271,43 @@ vectors, if any.
 
 When `IncludeData` is `true`, the response will contain the data of the vectors, if any.
 
+**Dense Indexes**
 ```go
 scores, err := index.Query(vector.Query{
-    Vector:          []float32{0.0, 1.0},
-    TopK:            2,
-    IncludeVectors:  false,
-    IncludeMetadata: false,
-    IncludeData: false,
+	Vector:          []float32{0.0, 1.0},
+	TopK:            2,
+	IncludeVectors:  false,
+	IncludeMetadata: false,
+	IncludeData:     false,
+})
+```
+
+**Sparse Indexes**
+```go
+scores, err := index.Query(vector.Query{
+	SparseVector: &vector.SparseVector{
+		Indices: []int32{0, 1},
+		Values:  []float32{0.5, 0.5},
+	},
+	TopK:            2,
+	IncludeVectors:  false,
+	IncludeMetadata: false,
+	IncludeData:     false,
+})
+```
+
+**Hybrid Indexes**
+```go
+scores, err := index.Query(vector.Query{
+	Vector: []float32{0.0, 1.0},
+	SparseVector: &vector.SparseVector{
+		Indices: []int32{0, 1},
+		Values:  []float32{0.5, 0.5},
+	},
+	TopK:            2,
+	IncludeVectors:  false,
+	IncludeMetadata: false,
+	IncludeData:     false,
 })
 ```
 
@@ -224,18 +317,14 @@ docs for more information.
 
 ```go
 scores, err := index.Query(vector.Query{
-    Vector:          []float32{0.0, 1.0},
-    TopK:            2,
-    IncludeVectors:  false,
-    IncludeMetadata: false,
-    IncludeData: false,
-    Filter: `foo = 'bar'`
+	..., 
+	Filter: `foo = 'bar'`
 })
 ```
 
 ### Querying with Raw Data
 
-If the vector index is created with a predefined embedding model, a query can be executed using the raw data
+If the vector index is created with an embedding model, a query can be executed using the raw data
 without explicitly converting it to an embedding. Upstash server will create the embedding and run the query.
 
 When `TopK` is specified, at most that many vectors will be returned.
@@ -249,12 +338,116 @@ When `IncludeData` is `true`, the response will contain the data of the vectors,
 
 ```go
 scores, err := index.QueryData(vector.QueryData{
-    Data:            "Where is the capital of Turkey?",
-    TopK:            2,
-    IncludeVectors:  false,
-    IncludeMetadata: false,
-    IncludeData: false,
-    Filter: `foo = 'bar'`
+	Data:            "Where is the capital of Turkey?",
+	TopK:            2,
+	IncludeVectors:  false,
+	IncludeMetadata: false,
+	IncludeData:     false,
+	Filter:          `foo = 'bar'`,
+})
+```
+
+### Resumable Querying Vectors
+
+With a similar interface to query and query data, query results
+can be fetched page by page with resumable queries.
+
+#### Resumalbe Query
+
+When a resumable query is started, it returns the first
+page of the query results, and returns a handle that
+can be used to fetch next pages. When enough query results
+are fetched, handle can be closed to release the resources
+acquired in the index to facilitate the resumable query.
+
+**Dense Indexes**
+```go
+scores, handle, err := index.ResumableQuery(vector.ResumableQuery{
+	Vector:          []float32{0.0, 1.0},
+	TopK:            2,
+	IncludeVectors:  false,
+	IncludeMetadata: false,
+	IncludeData:     false,
+})
+defer handle.Close()
+
+scores, err = handle.Next(vector.ResumableQueryNext{
+	AdditionalK: 3,
+})
+
+scores, err = handle.Next(vector.ResumableQueryNext{
+	AdditionalK: 5,
+})
+```
+
+**Sparse Indexes**
+```go
+scores, handle, err := index.ResumableQuery(vector.ResumableQuery{
+	SparseVector: &vector.SparseVector{
+		Indices: []int32{0, 1},
+		Values:  []float32{0.5, 0.5},
+	},
+	TopK:            2,
+	IncludeVectors:  false,
+	IncludeMetadata: false,
+	IncludeData:     false,
+})
+defer handle.Close()
+
+scores, err = handle.Next(vector.ResumableQueryNext{
+	AdditionalK: 3,
+})
+
+scores, err = handle.Next(vector.ResumableQueryNext{
+	AdditionalK: 5,
+})
+```
+
+**Hybrid Indexes**
+```go
+scores, handle, err := index.ResumableQuery(vector.ResumableQuery{
+	Vector: []float32{0.0, 1.0},
+	SparseVector: &vector.SparseVector{
+		Indices: []int32{0, 1},
+		Values:  []float32{0.5, 0.5},
+	},
+	TopK:            2,
+	IncludeVectors:  false,
+	IncludeMetadata: false,
+	IncludeData:     false,
+})
+defer handle.Close()
+
+scores, err = handle.Next(vector.ResumableQueryNext{
+	AdditionalK: 3,
+})
+
+scores, err = handle.Next(vector.ResumableQueryNext{
+	AdditionalK: 5,
+})
+```
+
+#### Resumable Query with Data
+
+If the vector index is created with an embedding model, a resumable query can be started using the raw data
+without explicitly converting it to an embedding. Upstash server will create the embedding and start the query.
+
+```go
+scores, handle, err := index.ResumableQueryData(vector.ResumableQueryData{
+	Data:            "Where is the capital of Turkey?",
+	TopK:            2,
+	IncludeVectors:  false,
+	IncludeMetadata: false,
+	IncludeData:     false,
+})
+defer handle.Close()
+
+scores, err = handle.Next(vector.ResumableQueryNext{
+	AdditionalK: 3,
+})
+
+scores, err = handle.Next(vector.ResumableQueryNext{
+	AdditionalK: 5,
 })
 ```
 
@@ -271,10 +464,10 @@ When `IncludeData` is `true`, the response will contain the data of the vectors,
 
 ```go
 vectors, err := index.Fetch(vector.Fetch{
-    Ids: []string{"0", "1"},
-    IncludeVectors: false,
-    IncludeMetadata: false,
-    IncludeData: false,
+	Ids:             []string{"0", "1"},
+	IncludeVectors:  false,
+	IncludeMetadata: false,
+	IncludeData:     false,
 })
 ```
 
@@ -294,7 +487,7 @@ count, err := index.DeleteMany([]string{"0", "999"})
 ok, err := index.Delete("2")
 ```
 
-### Scanning the Vectors
+### Scanning Vectors
 
 All or some of the vectors in the index can scanned by fetching range of vectors.
 
@@ -309,27 +502,38 @@ When `IncludeData` is `true`, the response will contain the data of the vectors,
 
 ```go
 vectors, err := index.Range(vector.Range{
-    Cursor:          "0",
-    Limit:           10,
-    IncludeVectors:  false,
-    IncludeMetadata: false,
-    IncludeData: false,
+	Cursor:          "0",
+	Limit:           10,
+	IncludeVectors:  false,
+	IncludeMetadata: false,
+	IncludeData:     false,
 })
 
 for vectors.NextCursor != "" {
-    for _, v := range vectors.Vectors {
-        // process individual vectors
-    }
+	for _, v := range vectors.Vectors {
+		// process individual vectors
+	}
 
-    // Fetch the next range batch
-    vectors, err = index.Range(vector.Range{
-        Cursor:          vectors.NextCursor,
-        Limit:           10,
-        IncludeVectors:  false,
-        IncludeMetadata: false,
-        IncludeData: false,
-    })
+	// Fetch the next range batch
+	vectors, err = index.Range(vector.Range{
+		Cursor:          vectors.NextCursor,
+		Limit:           10,
+		IncludeVectors:  false,
+		IncludeMetadata: false,
+		IncludeData:     false,
+	})
 }
+```
+
+### Updating Vectors
+
+Any combination of vector value, sparse vector value, data, or metadata can be updated.
+
+```go
+ok, err := index.Update(vector.Update{
+	Id:       "id",
+	Metadata: map[string]any{"new": "metadata"},
+})
 ```
 
 ### Resetting the Index

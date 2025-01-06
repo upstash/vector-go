@@ -1,32 +1,30 @@
 package vector
 
 import (
-	"github.com/stretchr/testify/require"
 	"testing"
 	"time"
+
+	"github.com/stretchr/testify/require"
 )
 
 func TestNamespace(t *testing.T) {
-
 	t.Run("list namespaces", func(t *testing.T) {
-		client, err := newTestClient()
-		require.NoError(t, err)
+		index := NewIndexFromEnv()
 
 		for _, ns := range namespaces {
-			createNamespace(t, client, ns)
+			createNamespace(t, index, ns)
 		}
 
-		ns, err := client.ListNamespaces()
+		ns, err := index.ListNamespaces()
 		require.NoError(t, err)
 		require.Exactly(t, []string{"", "ns"}, ns)
 	})
 
 	t.Run("delete namespaces", func(t *testing.T) {
-		client, err := newTestClient()
-		require.NoError(t, err)
+		index := NewIndexFromEnv()
 
 		for _, ns := range namespaces {
-			createNamespace(t, client, ns)
+			createNamespace(t, index, ns)
 		}
 
 		for _, ns := range namespaces {
@@ -34,30 +32,34 @@ func TestNamespace(t *testing.T) {
 				continue
 			}
 
-			err := client.Namespace(ns).DeleteNamespace()
+			err := index.Namespace(ns).DeleteNamespace()
 			require.NoError(t, err)
 		}
 
-		info, err := client.Info()
+		info, err := index.Info()
 		require.NoError(t, err)
 		require.Exactly(t, 1, len(info.Namespaces))
 	})
 }
 
-func createNamespace(t *testing.T, client *Index, ns string) {
+func createNamespace(t *testing.T, index *Index, ns string) {
 	if ns == "" {
+		err := index.Reset()
+		require.NoError(t, err)
 		return
 	}
 
-	namespace := client.Namespace(ns)
+	namespace := index.Namespace(ns)
+	err := namespace.Reset()
+	require.NoError(t, err)
 
-	err := namespace.Upsert(Upsert{
+	err = namespace.Upsert(Upsert{
 		Vector: []float32{0.1, 0.1},
 	})
 	require.NoError(t, err)
 
 	require.Eventually(t, func() bool {
-		info, err := client.Info()
+		info, err := index.Info()
 		require.NoError(t, err)
 		return info.PendingVectorCount == 0
 	}, 10*time.Second, 1*time.Second)

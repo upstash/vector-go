@@ -1,20 +1,20 @@
 package vector
 
 import (
-	"github.com/stretchr/testify/require"
 	"testing"
 	"time"
+
+	"github.com/stretchr/testify/require"
 )
 
 func TestInfo(t *testing.T) {
-	client, err := newTestClient()
-	require.NoError(t, err)
+	index := NewIndexFromEnv()
 
 	for _, ns := range namespaces {
-		createNamespace(t, client, ns)
+		createNamespace(t, index, ns)
 	}
 
-	info, err := client.Info()
+	info, err := index.Info()
 	require.NoError(t, err)
 	require.Equal(t, info.VectorCount, 0)
 	require.Equal(t, 2, info.Dimension)
@@ -27,7 +27,7 @@ func TestInfo(t *testing.T) {
 	}
 
 	for _, ns := range namespaces {
-		err = client.Namespace(ns).Upsert(Upsert{
+		err = index.Namespace(ns).Upsert(Upsert{
 			Id:     randomString(),
 			Vector: []float32{0, 1},
 		})
@@ -35,7 +35,7 @@ func TestInfo(t *testing.T) {
 	}
 
 	require.Eventually(t, func() bool {
-		info, err := client.Info()
+		info, err := index.Info()
 		require.NoError(t, err)
 		return info.VectorCount == len(namespaces)
 	}, 10*time.Second, 1*time.Second)

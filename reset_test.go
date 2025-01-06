@@ -1,26 +1,26 @@
 package vector
 
 import (
-	"github.com/stretchr/testify/require"
 	"testing"
 	"time"
+
+	"github.com/stretchr/testify/require"
 )
 
 func TestReset(t *testing.T) {
 	for _, ns := range namespaces {
 		t.Run("namespace_"+ns, func(t *testing.T) {
-			client, err := newTestClient()
+			client, err := newTestClient(testClientTypeDense, ns)
 			require.NoError(t, err)
 
-			namespace := client.Namespace(ns)
 			id := randomString()
-			err = namespace.Upsert(Upsert{
+			err = client.Upsert(Upsert{
 				Id:     id,
 				Vector: []float32{0, 1},
 			})
 			require.NoError(t, err)
 
-			err = namespace.Reset()
+			err = client.Reset()
 			require.NoError(t, err)
 
 			require.Eventually(t, func() bool {

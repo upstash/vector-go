@@ -10,15 +10,14 @@ import (
 func TestEmbedding(t *testing.T) {
 	for _, ns := range namespaces {
 		t.Run("namespace_"+ns, func(t *testing.T) {
-			client, err := newEmbeddingTestClient()
+			client, err := newTestClient(testClientTypeDenseEmbedding, ns)
 			require.NoError(t, err)
 
-			namespace := client.Namespace(ns)
 			id0 := "tr"
 			id1 := "jp"
 			id2 := "uk"
 			id3 := "fr"
-			err = namespace.UpsertDataMany([]UpsertData{
+			err = client.UpsertDataMany([]UpsertData{
 				{
 					Id:       id0,
 					Data:     "Capital of Türkiye is Ankara.",
@@ -49,7 +48,7 @@ func TestEmbedding(t *testing.T) {
 			}, 10*time.Second, 1*time.Second)
 
 			t.Run("score", func(t *testing.T) {
-				scores, err := namespace.QueryData(QueryData{
+				scores, err := client.QueryData(QueryData{
 					Data: "where is the capital of Japan?",
 					TopK: 1,
 				})
@@ -59,7 +58,7 @@ func TestEmbedding(t *testing.T) {
 			})
 
 			t.Run("with metadata", func(t *testing.T) {
-				scores, err := namespace.QueryData(QueryData{
+				scores, err := client.QueryData(QueryData{
 					Data:            "Which country's capital is Ankara?",
 					TopK:            1,
 					IncludeMetadata: true,
@@ -81,13 +80,55 @@ func TestEmbedding(t *testing.T) {
 					Filter:          `country = 'fr'`,
 				}
 
-				scores, err := namespace.QueryData(query)
+				scores, err := client.QueryData(query)
 				require.NoError(t, err)
 				require.Equal(t, 1, len(scores))
 				require.Equal(t, id3, scores[0].Id)
 				require.Equal(t, map[string]any{"country": "fr", "capital": "Paris"}, scores[0].Metadata)
 				require.Equal(t, "Capital of France is Paris.", scores[0].Data)
 			})
+		})
+	}
+}
+
+func TestHybridQueryDataQueryMode(t *testing.T) {
+	for _, ns := range namespaces {
+		t.Run("namespace_"+ns, func(t *testing.T) {
+			client, err := newTestClient(testClientTypeHybridEmbedding, ns)
+			require.NoError(t, err)
+
+			err = client.UpsertDataMany([]UpsertData{
+				{
+					Id:   "id0",
+					Data: "hello",
+				},
+				{
+					Id:   "id1",
+					Data: "hello world",
+				},
+				{
+					Id:   "id2",
+					Data: "hello world Upstash",
+				},
+			})
+			require.NoError(t, err)
+
+			require.Eventually(t, func() bool {
+				info, err := client.Info()
+				require.NoError(t, err)
+				return info.PendingVectorCount == 0
+			}, 10*time.Second, 1*time.Second)
+
+			scores, err := client.QueryData(QueryData{
+				Data:      "hello world Upstash",
+				QueryMode: QueryModeSparse,
+			})
+			require.NoError(t, err)
+
+			require.Equal(t, 3, len(scores))
+			require.Equal(t, "id2", scores[0].Id)
+			require.Equal(t, "id1", scores[1].Id)
+			require.Equal(t, "id0", scores[2].Id)
 		})
 	}
 }
